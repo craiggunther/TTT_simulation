@@ -135,8 +135,9 @@ void  HTTPClient:: sendHTTPResponseToPeer(HTTPMsg *httpmsg)
       // //httpMsg->setDestAddress(srvAddr);
       // httpMsg->setSrcAddress(addr);
       // int dest = httpMsg->getDestAddress();
-    HTTPMsg *msg = generateMessage();
-      int dest = msg->getDestAddress();
+      HTTPMsg *msg = generateMessage();
+      int dest = httpmsg->getDestAddress();
+
        EV << "send packet packet to peer addr=" << dest << endl;
        if (dest >= 2 and  dest< clientsCount+2 )
        {
@@ -144,9 +145,9 @@ void  HTTPClient:: sendHTTPResponseToPeer(HTTPMsg *httpmsg)
       // for (int i=0; i<clientsCount; i++) {
           // HTTPMsg *httpMsg = new HTTPMsg();
          //  httpMsg->setPayload(header);
-         ////  httpMsg->setSrcAddress(addr);
-         //  httpMsg->setDestAddress(dest);
-           send(msg,"voiceP2P$o",0);
+          // msg->setSrcAddress(addr);
+           msg->setDestAddress(dest);
+           send(msg,"voiceP2P$o",dest);
         }
 
 
@@ -162,8 +163,8 @@ HTTPMsg *HTTPClient::generateMessage()
   int dest = intuniform(0,n+2);
   if (dest>=src) dest++;
 
-  char msgname[20];
-  sprintf(msgname, "TTT-%d-to-%d", src, dest);
+  //char msgname[20];
+  //sprintf(msgname, "TTT-%d-to-%d", src, dest);
 
   // Create message object and set source and destination field.
   HTTPMsg *httpmsg = new HTTPMsg();
