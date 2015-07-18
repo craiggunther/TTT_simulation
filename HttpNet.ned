@@ -7,17 +7,16 @@
 // `license' for details on this and other legal matters.
 //
 // Model of the network, consisting of several clients, a server and a cloud
-//
+
 network HTTPNet
 {
     parameters:
         int numClients @prompt("Number of clients:") = default(3);
         @display("bgb=992,619");
-        
+
    	//types:
         //channel C extends ned.DatarateChannel {
-               //datarate = 100Mbps;
-		//}
+               //datarate = 100Mbps;//
     submodules:
         server: HTTPServer {
             parameters:
@@ -53,10 +52,9 @@ network HTTPNet
                 srvAddr = 0;
                 clientRole = 0;
                 clientsCount = numClients;
-               // relayergate=10;
             gates:
                 voiceUpload[1];
-                voiceP2P[2^numClients];
+                voiceP2P[2*numClients];
                 p2pin[];
                 p2pout[];
 
@@ -73,28 +71,27 @@ network HTTPNet
         server.voiceFlow[0] <--> cloud.voiceServer[0];
         Presenter.voiceUpload[0] <--> cloud.voicePresenter[0];
 
-       // Students[i].voiceUpload[0] <--> cloud.voiceListeners[i] for i=0..numClients-1;
+        Students[i].voiceUpload[0] <--> cloud.voiceListeners[i] for i=0..numClients-1;
         Presenter.voiceP2P[0] <--> Relayers.voicePresenter[0];
-        //Relayers.voiceListeners[i] <--> Students[i].voiceP2P[2*numClients] for i=0..numClients-1;
+        Relayers.voiceListeners[i] <--> Students[i].voiceP2P[2*numClients-1] for i=0..numClients-1;
 
         //p2p part configure
        // Students[i].voiceP2P++ <--> Students[i+1].voiceP2P++ for i=0..numClients-2;
-       
-       Students[0].voiceP2P[0] <--> Students[1].voiceP2P[0] if numClients==2;
-       
-		for i=0..numClients-1, for j = (i*numClients)..(i+1)*numClients-1 {
+
+     //  Students[0].voiceP2P[0] <--> Students[1].voiceP2P[0] if numClients==2;
+
+	//	for i=0..numClients-1, for j = (i*numClients)..(i+1)*numClients-1 {
 //              //node[i].out[j] --> node[rightNodeIndex(i,j)].in[j];
 //            //  Students[i].p2pout[j]-->Students[rightNodeIndex(i,j)].p2pin[j];
 //              
-             Students[i].voiceP2P[j] <--> Students[i].voiceP2P[j] ;
+          //   Students[i].voiceP2P[j] <--> Students[i].voiceP2P[j] if ;
              //Students[i].voiceP2P[j] <--> Students[i#(1<<j)].voiceP2P[j] if (i < i#(1<<j));
-  
-           }
-            
-             // for i=0..(numClients-2), for j=(i+1)..(numClients-1) {
-             
-             // Students[i].voiceP2P[j] <--> Students[j].voiceP2P[i];
-       // }
+
+       //    }
+
+        for i=0..(numClients-2), for j=(i+1)..(numClients-1) {
+            Students[i].voiceP2P[j] <--> Students[j].voiceP2P[i];
+        }
 }
 
 
