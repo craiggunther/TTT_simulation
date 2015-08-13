@@ -25,6 +25,8 @@
  * {
  *     int srcAddress;
  *     int destAddress;
+ *     int hopCount = 0;
+ *     int remainingHops = 32;
  * }
  * </pre>
  */
@@ -33,6 +35,8 @@ class NetPkt : public ::cPacket
   protected:
     int srcAddress_var;
     int destAddress_var;
+    int hopCount_var;
+    int remainingHops_var;
 
   private:
     void copy(const NetPkt& other);
@@ -55,6 +59,10 @@ class NetPkt : public ::cPacket
     virtual void setSrcAddress(int srcAddress);
     virtual int getDestAddress() const;
     virtual void setDestAddress(int destAddress);
+    virtual int getHopCount() const;
+    virtual void setHopCount(int hopCount);
+    virtual int getRemainingHops() const;
+    virtual void setRemainingHops(int remainingHops);
 };
 
 inline void doPacking(cCommBuffer *b, NetPkt& obj) {obj.parsimPack(b);}

@@ -1,0 +1,78 @@
+----------------------------------------------------------------------
+
+
+Tcl error: moduleinspector.cc#499: bad window path name ""
+    while executing
+"winfo toplevel [focus]"
+    invoked from within
+"if [catch {
+       opp_displaystring $dispstr parse tags $submodptr 1
+
+       # scale (x,y)
+       if {$scaling != ""} {
+           set x [expr $scali..."
+    (procedure "ModuleInspector:drawSubmodule" line 20)
+    invoked from within
+"ModuleInspector:drawSubmodule .network.c ptr0x24fc6f0 -nan -nan {Students[0]} {p=,,m,2,50,50;i=device/pc2} {} 0"
+
+
+Tcl error: moduleinspector.cc#499: bad window path name ""
+    while executing
+"winfo toplevel [focus]"
+    invoked from within
+"if [catch {
+       opp_displaystring $dispstr parse tags $submodptr 1
+
+       # scale (x,y)
+       if {$scaling != ""} {
+           set x [expr $scali..."
+    (procedure "ModuleInspector:drawSubmodule" line 20)
+    invoked from within
+"ModuleInspector:drawSubmodule .network.c ptr0x25209d0 -nan -nan {Students[1]} {p=,,m,2,50,50;i=device/pc2} {} 0"
+
+
+Tcl error: moduleinspector.cc#499: bad window path name ""
+    while executing
+"winfo toplevel [focus]"
+    invoked from within
+"if [catch {
+       opp_displaystring $dispstr parse tags $submodptr 1
+
+       # scale (x,y)
+       if {$scaling != ""} {
+           set x [expr $scali..."
+    (procedure "ModuleInspector:drawSubmodule" line 20)
+    invoked from within
+"ModuleInspector:drawSubmodule .network.c ptr0x25219b0 -nan -nan {Students[2]} {p=,,m,2,50,50;i=device/pc2} {} 0"
+
+
+Tcl error: moduleinspector.cc#499: bad window path name ""
+    while executing
+"winfo toplevel [focus]"
+    invoked from within
+"if [catch {
+       opp_displaystring $dispstr parse tags $submodptr 1
+
+       # scale (x,y)
+       if {$scaling != ""} {
+           set x [expr $scali..."
+    (procedure "ModuleInspector:drawSubmodule" line 20)
+    invoked from within
+"ModuleInspector:drawSubmodule .network.c ptr0x2522930 -nan -nan {Students[3]} {p=,,m,2,50,50;i=device/pc2} {} 0"
+
+
+Tcl error: moduleinspector.cc#499: bad window path name ""
+    while executing
+"winfo toplevel [focus]"
+    invoked from within
+"if [catch {
+       opp_displaystring $dispstr parse tags $submodptr 1
+
+       # scale (x,y)
+       if {$scaling != ""} {
+           set x [expr $scali..."
+    (procedure "ModuleInspector:drawSubmodule" line 20)
+    invoked from within
+"ModuleInspector:drawSubmodule .network.c ptr0x2523a60 -nan -nan {Students[4]} {p=,,m,2,50,50;i=device/pc2} {} 0"
+
+

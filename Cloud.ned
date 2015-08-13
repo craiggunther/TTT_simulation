@@ -23,5 +23,6 @@ simple Cloud
         inout voiceServer[];
         inout voicePresenter[];
         inout voiceListeners[];
+        inout voiceRelayer[];
 }
 

@@ -37,6 +37,7 @@ void Cloud::handleMessage(cMessage *msg)
     // determine destination address
     NetPkt *pkt = check_and_cast<NetPkt *>(msg);
     int dest = pkt->getDestAddress();
+
     EV << "Relaying packet to addr=" << dest << endl;
 
     if (dest == 0) {

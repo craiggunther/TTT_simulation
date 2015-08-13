@@ -14,6 +14,8 @@ packet NetPkt
 {
     int srcAddress;
     int destAddress;
+    int hopCount = 0;
+    int remainingHops = 32;
 };
 
 

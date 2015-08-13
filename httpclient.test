@@ -1,0 +1,5 @@
+%description
+This test intend to test TTT project P2P module. First phase
+In this phase, we made all listeners connect to each other. Presenter will send post packets to cloud and listeners. 
+then listener will try to send get packet to their peer nodes (in phase 1, it will send message to all peer, later will change the alrigthem)
+peer node received the get message, they will generate post message and send back to requester.

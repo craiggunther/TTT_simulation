@@ -7,8 +7,11 @@
 // `license' for details on this and other legal matters.
 //
 // all the EV print is for debugging purpose, please delete them prior to run the real simulation.
+
+#include <map>
 #include <omnetpp.h>
 #include "HttpMsg_m.h"
+
 
 class HTTPClient: public cSimpleModule {
 
@@ -17,7 +20,14 @@ private:
     int srvAddr;
     int clientRole;
     int clientsCount;
+    simtime_t propDelay;
+    // signals
+    simsignal_t endToEndDelaySignal;
+    simsignal_t hopCountSignal;
+    simsignal_t sourceAddressSignal;
 
+    typedef std::map<int,int> RoutingTable; // destaddr -> gateindex
+       RoutingTable rtable;
 protected:
     virtual void initialize();
     virtual void handleMessage(cMessage *msg);
@@ -41,62 +51,96 @@ void HTTPClient::initialize() {
     clientRole = par("clientRole");
     clientsCount = par("clientsCount");
 
-    cMessage *timer = new cMessage("timer");
-    scheduleAt(simTime() + par("sendIaTime").doubleValue(), timer);
+     propDelay = (double)par("propDelay");
+     cMessage *timer = new cMessage("timer");
+     scheduleAt(simTime() + par("sendIaTime").doubleValue(), timer);
+     //register signal for analysis
+     endToEndDelaySignal = registerSignal("endToEndDelay");
+     hopCountSignal =  registerSignal("hopCount");
+     sourceAddressSignal = registerSignal("sourceAddress");
+
 }
 
 void HTTPClient::handleMessage(cMessage *msg) {
-    //if self-message ,then check the role, the presenter role will send post message, otherwise will send get message
+    //if self-message ,then check the role, the presenter role will send post message(in first phase, post message means include contents),
+    //otherwise will send get message (get message means request)
+
     if (msg->isSelfMessage()) {
-        EV << "Starting service of ";
         if (clientRole == 1) {
+            EV << "Client presenter Starting service of ";
             sendHTTPRequestPost();
         } else {
+            EV << "Client students Starting service of ";
+
             sendHTTPRequest();
         }
+        //scheduled message for trigger presenter to send content.
         scheduleAt(simTime() + par("sendIaTime").doubleValue(), msg);
 
     } else {
         // if not a sefl-message, which message received messge from other nodes, will check src address match 1(presenter)or 0(server),
         // delete them if so, otherwise  call sendtopeer function to send post message to response.
+        // Handle incoming packet stat
         int src = check_and_cast<HTTPMsg *>(msg)->getSrcAddress();
-        EV << "check source addr "<<src <<endl;
+        EV << "received packet " << endl;
+        EV <<"the packet come from src addr is " << src<<endl;
+
+        emit(endToEndDelaySignal, simTime() - msg->getCreationTime());
+        //emit(hopCountSignal, msg->getHopCount());
+        emit(sourceAddressSignal, check_and_cast<HTTPMsg *>(msg)->getSrcAddress());
         if (src == 1 or src == 0) {
-            EV <<"test" << endl;
+            //if the message received from presenter and cloud server, we just simply delete them as this is a normal module.
+            EV <<"test to delete message " << endl;
             processHTTPReply(check_and_cast<HTTPMsg *>(msg));
+
         }
         else {
+            //get the input gate info from arrived message.
             cGate *gate = msg->getArrivalGate();
-            EV << gate->getFullName() << ": " <<endl;
-
-        sendHTTPResponseToPeer(check_and_cast<HTTPMsg *>(msg));
+            EV <<"Gate name is : "<< gate->getFullName() <<endl;
+            sendHTTPResponseToPeer(check_and_cast<HTTPMsg *>(msg));
         }
     }
 }
 void HTTPClient::sendHTTPRequest() {
-
+// the method will send "get " type message to peer node to simulate as request. the current message will send to random gate
+// the method will take self message as parameter to trigger the process
     const char *header = "GET / HTTP/1.0\r\n\r\n";
+
+  //  k means dest address, so the address will start from 2 to number of peer
+    int k = intuniform(2,clientsCount);
+    EV <<"random number is : "<< k <<endl;
+
+    EV << " addr is " << addr <<endl;
+    // this is a self message, so this addr is the sender's own address, if the address is 3 which means the module is stu1. we always minus 2 to calculate the peer.
+    int gateindex  = addr -2;
+
+    // random number k will be assigned to dest address
+    int destAddr = k;
+
+    EV << "module name is  stu [ " << gateindex << "]"<<endl;
+
+
     // assemble and send HTTP request
     HTTPMsg *httpMsg = new HTTPMsg();
     httpMsg->setPayload(header);
-    httpMsg->setDestAddress(srvAddr);
+    httpMsg->setDestAddress(destAddr);
     httpMsg->setSrcAddress(addr);
 
-    int n = gateSize("voiceP2P");
-    EV << "Node gate voiceP2P size is " << n << endl;
-
-   //broadcasting message to othernode
-    for (int i=0; i<n;i++){
-        HTTPMsg *copy =httpMsg->dup();
-        send(copy,"voiceP2P$o",i);
+   //broadcasting message to other node
+   // for (int i=0; i<n;i++){
+    //    HTTPMsg *copy =httpMsg->dup();
+    //    send(copy,"voiceP2P$o",i);
+    //}
+    EV <<"gateindex1 is :"<< k <<endl;
+    if (k!=gateindex) {
+        send(httpMsg, "voiceP2P$o", k);
     }
-  //  int k = intuniform(0,n/2);
-  //  if (k!=3) {
-  //  send(httpMsg, "voiceP2P$o", k);
-  //  }
-  //  else {
-   //     send(httpMsg, "voiceP2P$o", k-1);
-   // }
+    else {
+        int newaddr = abs(k-1);
+        httpMsg->setDestAddress(newaddr);
+        send(httpMsg, "voiceP2P$o", abs(k-1));
+    }
 
     //for (int i = 0; i < clientsCount; i++) {
     //        HTTPMsg *httpMsg = new HTTPMsg();
@@ -116,74 +160,94 @@ void HTTPClient::sendHTTPRequestPost() {
     httpMsg->setPayload(header);
     httpMsg->setDestAddress(srvAddr);
     httpMsg->setSrcAddress(addr);
-    EV << "Test for Presenter 1111"<< endl;
     send(httpMsg, "voiceUpload$o", 0);
 
     for (int i = 0; i < clientsCount; i++) {
         HTTPMsg *httpMsg = new HTTPMsg();
         httpMsg->setPayload(header);
         httpMsg->setSrcAddress(addr);
-
         httpMsg->setDestAddress(2 + i);
-         EV << "Test for Presenter"<< endl;
         send(httpMsg, "voiceP2P$o", 0);
+       // HTTPMsg *httpMsgnew = new HTTPMsg();
+        //httpMsgnew->setPayload(header);
+        //httpMsgnew->setSrcAddress(addr);
+
+        //httpMsgnew->setDestAddress(2 + i);
+       //          EV << "Test for Presenter2"<< endl;
+      //  sendDelayed(httpMsgnew, propDelay,"voiceP2P$o", 1);
     }
-}
-void HTTPClient::forwardMessage(HTTPMsg *httpmsg) {
-
-    //int n = gateSize("voiceP2P");
-     //  n = n/2;
-    //  int k = intuniform(0,n-1);
-
-     // EV << "Forwarding message " << httpmsg << " on port out[" << k << "]\n";
-   //   send(httpmsg, "voiceP2P$o", k);
-
-    sendHTTPResponseToPeer(httpmsg);
 }
 void HTTPClient::sendHTTPResponseToPeer(HTTPMsg *httpmsg) {
 
-    //get the input gate info from arrived message.
-    cGate *gate = httpmsg->getArrivalGate();
-    EV << gate->getFullName() << ": " <<endl;
-
     const char *header = "POST / HTTP/1.1\r\n\r\n";
-    int dest = httpmsg->getSrcAddress();
-    int src = httpmsg->getDestAddress();
-    //HTTPMsg *msg = generateMessage();
+    int destaddr = httpmsg->getDestAddress();
+    int srcaddr = httpmsg->getSrcAddress();
+
+    EV <<"current peer addr is "<<destaddr<< endl;
+// the destination addr minus 2 is the peer name for example, is destaddr is 5, then this module is stud3
     HTTPMsg *msg = new HTTPMsg();
     msg->setPayload(header);
-    msg->setDestAddress(dest);
-    msg->setSrcAddress(src);
+    //int n = gateSize("voiceP2P");
+    int k = intuniform(2,clientsCount);
 
-  EV << "peer" <<dest << "send packet to peer addr=" << src << endl;
-   if (dest >= 2 and dest < clientsCount + 1) {
-        //detect if the request received from peer node, peer node address greater than 2
-        msg->setDestAddress(dest);
-        send(msg, "voiceP2P$o", dest);
+
+     int gateindex  = destaddr ;
+
+     EV <<"gateindex2 is :"<< gateindex <<endl;
+     int ownAddr  = destaddr;
+     int peerAddr = srcaddr;
+     EV << "No11 peer Addr " <<peerAddr<<endl;
+     // during test, there is very rarely case, the ownAddr will euqal to peerAddr, we do a check and change their value if they are same
+     if (ownAddr == peerAddr) {
+         ownAddr = ownAddr-1;
+     }
+
+     EV << "No22 ownAddr: " << ownAddr <<endl;
+     msg->setDestAddress(k);
+     msg->setSrcAddress(ownAddr);
+
+
+   if (k != gateindex ) {
+        //detect if the request received from peer node, peer node address greater than
+
+        EV << "peer stu[" <<gateindex <<"]"<< "send packet to peer addr=" << k << endl;
+
+        send(msg, "voiceP2P$o", k);
     }
+   else {
+      int  newdest = abs(k - 1);
+       msg->setDestAddress(newdest);
+       EV << " one peer" <<gateindex << "send packet to peer addr=" << newdest << endl;
+       send(msg, "voiceP2P$o", abs(k-1));
+   }
+
+
 }
 
 HTTPMsg *HTTPClient::generateMessage() {
     // Produce source and destination addresses.
     const char *header = "POST / HTTP/1.1\r\n\r\n";
-    int src = getIndex();
-    int n = size();
-    //int n = clientsCount;
-    int dest = intuniform(0, n-2);
-    if (dest >= src)
-        dest++;
+    int n = gateSize("voiceP2P");
+    int k = intuniform(2,n/2);
     // Create message object and set source and destination field.
     HTTPMsg *httpmsg = new HTTPMsg();
     httpmsg->setPayload(header);
-    httpmsg->setSrcAddress(src);
-    httpmsg->setDestAddress(dest);
+    httpmsg->setSrcAddress(n);
+    httpmsg->setDestAddress(k);
     return httpmsg;
 }
 
 void HTTPClient::processHTTPReply(HTTPMsg *httpMsg) {
 
     int dest = httpMsg->getSrcAddress();
-    EV << "delete packet packet from addr=" << dest << endl;
+    EV << "delete packet from addr=" << dest << endl;
     delete httpMsg;
 }
 
+void HTTPClient::forwardMessage(HTTPMsg *httpmsg) {
+
+     // EV << "Forwarding message " << httpmsg << " on port out[" << k << "]\n";
+   //   send(httpmsg, "voiceP2P$o", k);
+
+    sendHTTPResponseToPeer(httpmsg);
+}

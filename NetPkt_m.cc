@@ -59,6 +59,8 @@ NetPkt::NetPkt(const char *name, int kind) : ::cPacket(name,kind)
 {
     this->srcAddress_var = 0;
     this->destAddress_var = 0;
+    this->hopCount_var = 0;
+    this->remainingHops_var = 32;
 }
 
 NetPkt::NetPkt(const NetPkt& other) : ::cPacket(other)
@@ -82,6 +84,8 @@ void NetPkt::copy(const NetPkt& other)
 {
     this->srcAddress_var = other.srcAddress_var;
     this->destAddress_var = other.destAddress_var;
+    this->hopCount_var = other.hopCount_var;
+    this->remainingHops_var = other.remainingHops_var;
 }
 
 void NetPkt::parsimPack(cCommBuffer *b)
@@ -89,6 +93,8 @@ void NetPkt::parsimPack(cCommBuffer *b)
     ::cPacket::parsimPack(b);
     doPacking(b,this->srcAddress_var);
     doPacking(b,this->destAddress_var);
+    doPacking(b,this->hopCount_var);
+    doPacking(b,this->remainingHops_var);
 }
 
 void NetPkt::parsimUnpack(cCommBuffer *b)
@@ -96,6 +102,8 @@ void NetPkt::parsimUnpack(cCommBuffer *b)
     ::cPacket::parsimUnpack(b);
     doUnpacking(b,this->srcAddress_var);
     doUnpacking(b,this->destAddress_var);
+    doUnpacking(b,this->hopCount_var);
+    doUnpacking(b,this->remainingHops_var);
 }
 
 int NetPkt::getSrcAddress() const
@@ -116,6 +124,26 @@ int NetPkt::getDestAddress() const
 void NetPkt::setDestAddress(int destAddress)
 {
     this->destAddress_var = destAddress;
+}
+
+int NetPkt::getHopCount() const
+{
+    return hopCount_var;
+}
+
+void NetPkt::setHopCount(int hopCount)
+{
+    this->hopCount_var = hopCount;
+}
+
+int NetPkt::getRemainingHops() const
+{
+    return remainingHops_var;
+}
+
+void NetPkt::setRemainingHops(int remainingHops)
+{
+    this->remainingHops_var = remainingHops;
 }
 
 class NetPktDescriptor : public cClassDescriptor
@@ -165,7 +193,7 @@ const char *NetPktDescriptor::getProperty(const char *propertyname) const
 int NetPktDescriptor::getFieldCount(void *object) const
 {
     cClassDescriptor *basedesc = getBaseClassDescriptor();
-    return basedesc ? 2+basedesc->getFieldCount(object) : 2;
+    return basedesc ? 4+basedesc->getFieldCount(object) : 4;
 }
 
 unsigned int NetPktDescriptor::getFieldTypeFlags(void *object, int field) const
@@ -179,8 +207,10 @@ unsigned int NetPktDescriptor::getFieldTypeFlags(void *object, int field) const
     static unsigned int fieldTypeFlags[] = {
         FD_ISEDITABLE,
         FD_ISEDITABLE,
+        FD_ISEDITABLE,
+        FD_ISEDITABLE,
     };
-    return (field>=0 && field<2) ? fieldTypeFlags[field] : 0;
+    return (field>=0 && field<4) ? fieldTypeFlags[field] : 0;
 }
 
 const char *NetPktDescriptor::getFieldName(void *object, int field) const
@@ -194,8 +224,10 @@ const char *NetPktDescriptor::getFieldName(void *object, int field) const
     static const char *fieldNames[] = {
         "srcAddress",
         "destAddress",
+        "hopCount",
+        "remainingHops",
     };
-    return (field>=0 && field<2) ? fieldNames[field] : NULL;
+    return (field>=0 && field<4) ? fieldNames[field] : NULL;
 }
 
 int NetPktDescriptor::findField(void *object, const char *fieldName) const
@@ -204,6 +236,8 @@ int NetPktDescriptor::findField(void *object, const char *fieldName) const
     int base = basedesc ? basedesc->getFieldCount(object) : 0;
     if (fieldName[0]=='s' && strcmp(fieldName, "srcAddress")==0) return base+0;
     if (fieldName[0]=='d' && strcmp(fieldName, "destAddress")==0) return base+1;
+    if (fieldName[0]=='h' && strcmp(fieldName, "hopCount")==0) return base+2;
+    if (fieldName[0]=='r' && strcmp(fieldName, "remainingHops")==0) return base+3;
     return basedesc ? basedesc->findField(object, fieldName) : -1;
 }
 
@@ -218,8 +252,10 @@ const char *NetPktDescriptor::getFieldTypeString(void *object, int field) const
     static const char *fieldTypeStrings[] = {
         "int",
         "int",
+        "int",
+        "int",
     };
-    return (field>=0 && field<2) ? fieldTypeStrings[field] : NULL;
+    return (field>=0 && field<4) ? fieldTypeStrings[field] : NULL;
 }
 
 const char *NetPktDescriptor::getFieldProperty(void *object, int field, const char *propertyname) const
@@ -261,6 +297,8 @@ std::string NetPktDescriptor::getFieldAsString(void *object, int field, int i) c
     switch (field) {
         case 0: return long2string(pp->getSrcAddress());
         case 1: return long2string(pp->getDestAddress());
+        case 2: return long2string(pp->getHopCount());
+        case 3: return long2string(pp->getRemainingHops());
         default: return "";
     }
 }
@@ -277,6 +315,8 @@ bool NetPktDescriptor::setFieldAsString(void *object, int field, int i, const ch
     switch (field) {
         case 0: pp->setSrcAddress(string2long(value)); return true;
         case 1: pp->setDestAddress(string2long(value)); return true;
+        case 2: pp->setHopCount(string2long(value)); return true;
+        case 3: pp->setRemainingHops(string2long(value)); return true;
         default: return false;
     }
 }

@@ -19,7 +19,14 @@ simple HTTPClient
         int clientRole;
         int clientsCount;
         volatile double sendIaTime @unit(s);
+        double propDelay @unit(s);
         @display("i=device/pc2");
+        @signal[endToEndDelay](type="simtime_t");
+        @signal[hopCount](type="long");
+        @signal[sourceAddress](type="long");
+        @statistic[endToEndDelay](title="end-to-end delay of arrived packets";unit=s;record=vector,mean,max;interpolationmode=none);
+        @statistic[hopCount](title="hop count of arrived packets";interpolationmode=none;record=vector?,mean,max);
+        @statistic[sourceAddress](title="source address of arrived packets";interpolationmode=none;record=vector?);
     gates:
        // input voiceFromCloud[];
        // input voiceFromPresenter[];
