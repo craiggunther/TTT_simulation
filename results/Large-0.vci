@@ -1,0 +1,73 @@
+file 157929 1439576052                                          
+version 2
+run Large-0-20150814-11:00:40-22831
+attr configname Large
+attr datetime 20150814-11:00:40
+attr experiment Large
+attr inifile omnetpp.ini
+attr iterationvars ""
+attr iterationvars2 $repetition=0
+attr measurement ""
+attr network HTTPNet
+attr processid 22831
+attr repetition 0
+attr replication #0
+attr resultdir results
+attr runnumber 0
+attr seedset 0
+
+vector 7  HTTPNet.Students[6]  endToEndDelay:vector  ETV
+attr interpolationmode  none
+attr title  "end-to-end delay of arrived packets, vector"
+attr unit  s
+vector 9  HTTPNet.Students[8]  endToEndDelay:vector  ETV
+attr interpolationmode  none
+attr title  "end-to-end delay of arrived packets, vector"
+attr unit  s
+vector 3  HTTPNet.Students[2]  endToEndDelay:vector  ETV
+attr interpolationmode  none
+attr title  "end-to-end delay of arrived packets, vector"
+attr unit  s
+vector 2  HTTPNet.Students[1]  endToEndDelay:vector  ETV
+attr interpolationmode  none
+attr title  "end-to-end delay of arrived packets, vector"
+attr unit  s
+vector 1  HTTPNet.Students[0]  endToEndDelay:vector  ETV
+attr interpolationmode  none
+attr title  "end-to-end delay of arrived packets, vector"
+attr unit  s
+vector 4  HTTPNet.Students[3]  endToEndDelay:vector  ETV
+attr interpolationmode  none
+attr title  "end-to-end delay of arrived packets, vector"
+attr unit  s
+vector 5  HTTPNet.Students[4]  endToEndDelay:vector  ETV
+attr interpolationmode  none
+attr title  "end-to-end delay of arrived packets, vector"
+attr unit  s
+vector 6  HTTPNet.Students[5]  endToEndDelay:vector  ETV
+attr interpolationmode  none
+attr title  "end-to-end delay of arrived packets, vector"
+attr unit  s
+vector 8  HTTPNet.Students[7]  endToEndDelay:vector  ETV
+attr interpolationmode  none
+attr title  "end-to-end delay of arrived packets, vector"
+attr unit  s
+vector 10  HTTPNet.Students[9]  endToEndDelay:vector  ETV
+attr interpolationmode  none
+attr title  "end-to-end delay of arrived packets, vector"
+attr unit  s
+vector 0  HTTPNet.Presenter  endToEndDelay:vector  ETV
+attr interpolationmode  none
+attr title  "end-to-end delay of arrived packets, vector"
+attr unit  s
+0	2085 434 32 6164 1.095874504565 17.222448760643 16 0.3 0.333907989307 4.848439965547 1.4704249094005
+1	2519 413 20 6152 0.995874504565 17.122448760643 16 0.2 0.2 3.2 0.64
+2	2932 3101 17 6693 0.826572730005 19.471666252658 127 0 0.2 3.2 0.64
+3	6033 19056 16 6719 0.826572730005 19.845267917523 781 0 0.2 3.2 0.64
+4	25089 19403 23 6718 0.995874504565 19.845267917523 795 0 0.2 3.2 0.64
+5	44492 18822 24 6711 0.995874504565 19.845267917523 771 0 0.2 3.2 0.64
+6	63314 19959 25 6715 0.995874504565 19.845267917523 819 0 0.2 3.2 0.64
+7	83273 18798 14 6714 0.826572730005 19.845267917523 771 0 0.2 3.2 0.64
+8	102071 19518 27 6713 0.995874504565 19.845267917523 799 0 0.2 3.2 0.64
+9	121589 18923 15 6691 0.826572730005 19.471666252658 775 0 0.2 3.2 0.64
+10	140512 17417 29 6717 0.995874504565 19.845267917523 685 0 0.2 3.2 0.64

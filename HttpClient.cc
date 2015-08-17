@@ -108,19 +108,17 @@ void HTTPClient::sendHTTPRequest() {
     const char *header = "GET / HTTP/1.0\r\n\r\n";
 
   //  k means dest address, so the address will start from 2 to number of peer
-    int k = intuniform(2,clientsCount);
+    int k = intuniform(2,clientsCount-1);
     EV <<"random number is : "<< k <<endl;
 
     EV << " addr is " << addr <<endl;
     // this is a self message, so this addr is the sender's own address, if the address is 3 which means the module is stu1. we always minus 2 to calculate the peer.
     int gateindex  = addr -2;
 
-    // random number k will be assigned to dest address
+    // random number k will be assigned to dest address,this also is the stu [3].
     int destAddr = k;
 
     EV << "module name is  stu [ " << gateindex << "]"<<endl;
-
-
     // assemble and send HTTP request
     HTTPMsg *httpMsg = new HTTPMsg();
     httpMsg->setPayload(header);
@@ -132,12 +130,18 @@ void HTTPClient::sendHTTPRequest() {
     //    HTTPMsg *copy =httpMsg->dup();
     //    send(copy,"voiceP2P$o",i);
     //}
-    EV <<"gateindex1 is :"<< k <<endl;
     if (k!=gateindex) {
+        EV <<"gateindex1 is :"<< k <<endl;
         send(httpMsg, "voiceP2P$o", k);
     }
     else {
+
         int newaddr = abs(k-1);
+        if (newaddr==addr){
+            EV <<"this is the bug, it will cause the src and dest addr become to same value, so we just simply make dest addr plus 1."<<endl;
+            newaddr = newaddr+1;
+        }
+        EV <<"gateindex2 is :"<< newaddr <<endl;
         httpMsg->setDestAddress(newaddr);
         send(httpMsg, "voiceP2P$o", abs(k-1));
     }
@@ -181,47 +185,36 @@ void HTTPClient::sendHTTPResponseToPeer(HTTPMsg *httpmsg) {
 
     const char *header = "POST / HTTP/1.1\r\n\r\n";
     int destaddr = httpmsg->getDestAddress();
-    int srcaddr = httpmsg->getSrcAddress();
-
-    EV <<"current peer addr is "<<destaddr<< endl;
+   // int srcaddr = httpmsg->getSrcAddress();
 // the destination addr minus 2 is the peer name for example, is destaddr is 5, then this module is stud3
     HTTPMsg *msg = new HTTPMsg();
     msg->setPayload(header);
     //int n = gateSize("voiceP2P");
-    int k = intuniform(2,clientsCount);
+    int k = intuniform(2,clientsCount-1);
 
-
+//the gate index is indicator of module name, for example, if index is 3 mean student[3] ,so the gate 3 is not connected to other node.
      int gateindex  = destaddr ;
+     EV << "module name is  stu [ " << gateindex << "]"<<endl;
 
-     EV <<"gateindex2 is :"<< gateindex <<endl;
      int ownAddr  = destaddr;
-     int peerAddr = srcaddr;
+     int peerAddr = k;
      EV << "No11 peer Addr " <<peerAddr<<endl;
-     // during test, there is very rarely case, the ownAddr will euqal to peerAddr, we do a check and change their value if they are same
-     if (ownAddr == peerAddr) {
-         ownAddr = ownAddr-1;
-     }
-
      EV << "No22 ownAddr: " << ownAddr <<endl;
-     msg->setDestAddress(k);
+     msg->setDestAddress(peerAddr);
      msg->setSrcAddress(ownAddr);
-
-
+// this will detect if the out gate index number same as moudule name, if so, this gate does not connect to other gate,we need to do some modify.
    if (k != gateindex ) {
-        //detect if the request received from peer node, peer node address greater than
 
         EV << "peer stu[" <<gateindex <<"]"<< "send packet to peer addr=" << k << endl;
 
         send(msg, "voiceP2P$o", k);
     }
    else {
-      int  newdest = abs(k - 1);
+     int  newdest = abs(k - 1);
        msg->setDestAddress(newdest);
-       EV << " one peer" <<gateindex << "send packet to peer addr=" << newdest << endl;
+      EV << " one peer" <<gateindex << "send packet to peer addr=" << newdest << endl;
        send(msg, "voiceP2P$o", abs(k-1));
    }
-
-
 }
 
 HTTPMsg *HTTPClient::generateMessage() {

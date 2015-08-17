@@ -1,0 +1,48 @@
+file 37923 1439502930                                           
+version 2
+run Small-0-20150813-14:50:47-21234
+attr configname Small
+attr datetime 20150813-14:50:47
+attr experiment Small
+attr inifile omnetpp.ini
+attr iterationvars ""
+attr iterationvars2 $repetition=0
+attr measurement ""
+attr network HTTPNet
+attr processid 21234
+attr repetition 0
+attr replication #0
+attr resultdir results
+attr runnumber 0
+attr seedset 0
+
+vector 1  HTTPNet.Students[0]  endToEndDelay:vector  ETV
+attr interpolationmode  none
+attr title  "end-to-end delay of arrived packets, vector"
+attr unit  s
+vector 2  HTTPNet.Students[1]  endToEndDelay:vector  ETV
+attr interpolationmode  none
+attr title  "end-to-end delay of arrived packets, vector"
+attr unit  s
+vector 3  HTTPNet.Students[2]  endToEndDelay:vector  ETV
+attr interpolationmode  none
+attr title  "end-to-end delay of arrived packets, vector"
+attr unit  s
+vector 4  HTTPNet.Students[3]  endToEndDelay:vector  ETV
+attr interpolationmode  none
+attr title  "end-to-end delay of arrived packets, vector"
+attr unit  s
+vector 5  HTTPNet.Students[4]  endToEndDelay:vector  ETV
+attr interpolationmode  none
+attr title  "end-to-end delay of arrived packets, vector"
+attr unit  s
+vector 0  HTTPNet.Presenter  endToEndDelay:vector  ETV
+attr interpolationmode  none
+attr title  "end-to-end delay of arrived packets, vector"
+attr unit  s
+0	1299 1092 16 2032 1.095874504565 42.241759299904 42 0.3 0.3 12.6 3.78
+1	2391 1091 9 2025 0.995874504565 42.141759299904 42 0.2 0.2 8.4 1.68
+2	3482 4174 10 2048 0.995874504565 42.609726709137 170 0 0.2 8.4 1.68
+3	7656 11058 11 2049 0.995874504565 42.609726709137 457 0 0.2 8.4 1.68
+4	18714 10379 12 2041 0.995874504565 42.496748203198 427 0 0.2 8.4 1.68
+5	29093 8830 13 2042 0.995874504565 42.496748203198 363 0 0.2 8.4 1.68
